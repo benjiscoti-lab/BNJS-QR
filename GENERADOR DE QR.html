@@ -1,0 +1,586 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Generador de Código QR Benjis-Tech</title>
+
+    <!-- Librería para generar códigos QR Benjis-Tech-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .contenedor {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        .encabezado {
+            background: #111827;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .encabezado h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .encabezado p {
+            color: #d1d5db;
+        }
+
+        .contenido {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 35px;
+        }
+
+        .panel h2 {
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        select,
+        textarea,
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 18px;
+            outline: none;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        select:focus,
+        textarea:focus,
+        input:focus {
+            border-color: #2563eb;
+        }
+
+        .botones {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 13px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .generar {
+            background: #2563eb;
+            color: white;
+        }
+
+        .generar:hover {
+            background: #1d4ed8;
+        }
+
+        .descargar {
+            background: #16a34a;
+            color: white;
+        }
+
+        .descargar:hover {
+            background: #15803d;
+        }
+
+        .limpiar {
+            background: #ef4444;
+            color: white;
+        }
+
+        .limpiar:hover {
+            background: #dc2626;
+        }
+
+        .resultado {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f9fafb;
+            border-radius: 15px;
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        #qrcode {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 250px;
+            min-width: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mensaje {
+            color: #6b7280;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pie {
+            text-align: center;
+            padding: 20px;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        @media (max-width: 700px) {
+            .contenido {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .encabezado h1 {
+                font-size: 25px;
+            }
+
+            .resultado {
+                min-height: 330px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <header class="encabezado">
+        <h1>🔳 Generador de Código QR Benjis-Tech</h1>
+        <p>Crea códigos QR de forma rápida y sencilla</p>
+    </header>
+
+    <main class="contenido">
+
+        <!-- PANEL DE CONFIGURACIÓN -->
+        <section class="panel">
+
+            <h2>Información</h2>
+
+            <label for="tipo">Tipo de contenido</label>
+
+            <select id="tipo" onchange="cambiarTipo()">
+                <option value="texto">Texto</option>
+                <option value="url">Página web / URL</option>
+                <option value="telefono">Teléfono</option>
+                <option value="email">Correo electrónico</option>
+                <option value="wifi">Wi-Fi</option>
+            </select>
+
+            <div id="campos">
+
+                <label for="contenido">Contenido</label>
+
+                <textarea
+                    id="contenido"
+                    placeholder="Escribe aquí el contenido que deseas convertir en QR..."
+                ></textarea>
+
+            </div>
+
+            <div class="botones">
+
+                <button class="generar" onclick="generarQR()">
+                    Generar QR
+                </button>
+
+                <button class="limpiar" onclick="limpiarQR()">
+                    Limpiar
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- RESULTADO -->
+        <section class="resultado">
+
+            <div id="qrcode"></div>
+
+            <p class="mensaje" id="mensaje">
+                Tu código QR aparecerá aquí
+            </p>
+
+            <br>
+
+            <button
+                class="descargar"
+                onclick="descargarQR()"
+            >
+                ⬇ Descargar QR
+            </button>
+
+        </section>
+
+    </main>
+
+    <footer class="pie">
+        Generador QR | HTML + CSS + JavaScript
+    </footer>
+
+</div>
+
+
+<script>
+
+    let qrActual = null;
+
+
+    /*
+    CAMBIAR TIPO DE CONTENIDO
+    */
+
+    function cambiarTipo() {
+
+        const tipo = document.getElementById("tipo").value;
+        const campos = document.getElementById("campos");
+
+        if (tipo === "wifi") {
+
+            campos.innerHTML = `
+
+                <label>Nombre de red (SSID)</label>
+
+                <input
+                    type="text"
+                    id="ssid"
+                    placeholder="Ejemplo: MiWifi"
+                >
+
+                <label>Contraseña</label>
+
+                <input
+                    type="text"
+                    id="password"
+                    placeholder="Contraseña Wi-Fi"
+                >
+
+                <label>Seguridad</label>
+
+                <select id="seguridad">
+
+                    <option value="WPA">
+                        WPA/WPA2
+                    </option>
+
+                    <option value="WEP">
+                        WEP
+                    </option>
+
+                    <option value="">
+                        Sin contraseña
+                    </option>
+
+                </select>
+            `;
+
+        } else {
+
+            let placeholder = "";
+
+            switch(tipo) {
+
+                case "url":
+                    placeholder = "https://www.ejemplo.com";
+                    break;
+
+                case "telefono":
+                    placeholder = "+502 0000-0000";
+                    break;
+
+                case "email":
+                    placeholder = "correo@ejemplo.com";
+                    break;
+
+                default:
+                    placeholder =
+                    "Escribe aquí el contenido...";
+            }
+
+            campos.innerHTML = `
+
+                <label for="contenido">
+                    Contenido
+                </label>
+
+                <textarea
+                    id="contenido"
+                    placeholder="${placeholder}"
+                ></textarea>
+
+            `;
+        }
+    }
+
+
+    /*
+    OBTENER INFORMACIÓN
+    */
+
+    function obtenerContenido() {
+
+        const tipo =
+            document.getElementById("tipo").value;
+
+
+        if (tipo === "wifi") {
+
+            const ssid =
+                document.getElementById("ssid").value;
+
+            const password =
+                document.getElementById("password").value;
+
+            const seguridad =
+                document.getElementById("seguridad").value;
+
+            if (!ssid) {
+
+                alert(
+                    "Escribe el nombre de la red Wi-Fi."
+                );
+
+                return null;
+            }
+
+            return `WIFI:T:${seguridad};S:${ssid};P:${password};;`;
+        }
+
+
+        const contenido =
+            document.getElementById("contenido").value.trim();
+
+
+        if (!contenido) {
+
+            alert(
+                "Escribe algún contenido para generar el código QR."
+            );
+
+            return null;
+        }
+
+
+        if (tipo === "url") {
+
+            if (
+                !contenido.startsWith("http://") &&
+                !contenido.startsWith("https://")
+            ) {
+
+                return "https://" + contenido;
+            }
+        }
+
+
+        if (tipo === "telefono") {
+
+            return "tel:" + contenido;
+        }
+
+
+        if (tipo === "email") {
+
+            return "mailto:" + contenido;
+        }
+
+
+        return contenido;
+    }
+
+
+    /*
+    GENERAR QR
+    */
+
+    function generarQR() {
+
+        const contenido =
+            obtenerContenido();
+
+        if (!contenido) return;
+
+
+        const contenedor =
+            document.getElementById("qrcode");
+
+        contenedor.innerHTML = "";
+
+
+        qrActual = new QRCode(
+            contenedor,
+            {
+                text: contenido,
+
+                width: 250,
+
+                height: 250,
+
+                colorDark: "#000000",
+
+                colorLight: "#ffffff",
+
+                correctLevel:
+                    QRCode.CorrectLevel.H
+            }
+        );
+
+
+        document.getElementById("mensaje").textContent =
+            "Código QR generado correctamente.";
+    }
+
+
+    /*
+    DESCARGAR QR
+    */
+
+
+function descargarQR() {
+
+    const canvasQR =
+        document.querySelector("#qrcode canvas");
+
+    if (!canvasQR) {
+
+        alert(
+            "Primero debes generar un código QR."
+        );
+
+        return;
+    }
+
+    // Configuración
+    const margen = 20;
+    const radio = 15;
+
+    const anchoQR = canvasQR.width;
+    const altoQR = canvasQR.height;
+
+    const anchoFinal = anchoQR + (margen * 2);
+    const altoFinal = altoQR + (margen * 2);
+
+    // Crear canvas final
+    const canvasFinal =
+        document.createElement("canvas");
+
+    canvasFinal.width = anchoFinal;
+    canvasFinal.height = altoFinal;
+
+    const ctx =
+        canvasFinal.getContext("2d");
+
+    // Fondo blanco
+    ctx.fillStyle = "#ffffff";
+
+    // Crear rectángulo con esquinas redondeadas
+    ctx.beginPath();
+
+    ctx.roundRect(
+        0,
+        0,
+        anchoFinal,
+        altoFinal,
+        radio
+    );
+
+    ctx.fill();
+
+    // Dibujar QR en el centro
+    ctx.drawImage(
+        canvasQR,
+        margen,
+        margen,
+        anchoQR,
+        altoQR
+    );
+
+    // Descargar
+    const enlace =
+        document.createElement("a");
+
+    enlace.download =
+        "codigo-qr.png";
+
+    enlace.href =
+        canvasFinal.toDataURL("image/png");
+
+    enlace.click();
+}
+
+
+    /*
+    LIMPIAR
+    */
+
+    function limpiarQR() {
+
+        document.getElementById("qrcode").innerHTML = "";
+
+        document.getElementById("mensaje").textContent =
+            "Tu código QR aparecerá aquí";
+
+
+        document.getElementById("tipo").value =
+            "texto";
+
+
+        cambiarTipo();
+    }
+
+</script>
+
+</body>
+</html>
+
